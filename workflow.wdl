@@ -17,7 +17,8 @@ workflow setid_VCFs {
 	}
 
     output {
-        File setid_vcf = run_setid.out_file
+        File setid_vcf = run_setid.out_vcf
+        File setid_tbi = run_setid.out_tbi
     }
 
 }
@@ -33,10 +34,12 @@ task run_setid {
     
     command <<<
 	bcftools annotate --set-id '%CHROM\_%POS\_%REF\_%FIRST_ALT' -Oz -o ~{out_name}.id.vcf.gz ~{vcf}
+    tabix -p vcf ~{out_name}.id.vcf.gz
     >>>
 
     output {
-        File out_file = select_first(glob("*.id.vcf.gz"))
+        File out_vcf = select_first(glob("*.id.vcf.gz"))
+        File out_tbi = select_first(glob("*.id.vcf.gz.tbi"))
     }
 
     runtime {
